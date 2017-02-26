@@ -11,51 +11,66 @@ boolean upState = false;
 boolean leftState = false;
 boolean rightState = false;
 
+int cycles=0;
+int pause=0;
+
 void setup() {
   pinMode(upPin, INPUT_PULLUP);
   pinMode(leftPin, INPUT_PULLUP);
   pinMode(rightPin, INPUT_PULLUP);
   pinMode(pullupPin, OUTPUT);
 
-  digitalWrite(pullupPin,HIGH);
-  
+  digitalWrite(pullupPin, HIGH);
+
+  afficheurSetup();
   Keyboard.begin();
 }
 
 void loop() {
   boolean state;
-  
+
   Keyboard.release(KEY_UP_ARROW);
   state = !digitalRead(upPin);
-  if (!upState && state){
+  if (!upState && state) {
     Keyboard.press(KEY_UP_ARROW);
-    upState=true;
+    upState = true;
+    cycles++;
+    pause=0;
   }
-  if(!state){
-    upState=false;
+  if (!state) {
+    upState = false;
   }
 
-  
+
   state = !digitalRead(leftPin);
-  if (!leftState && state){
+  if (!leftState && state) {
     Keyboard.press(KEY_LEFT_ARROW);
-    leftState=true;
+    leftState = true;
   }
-  
-  if(!state){
+
+  if (!state) {
     Keyboard.release(KEY_LEFT_ARROW);
-    leftState=false;
+    leftState = false;
   }
-  
+
   state = !digitalRead(rightPin);
-  if (!rightState && state){
+  if (!rightState && state) {
     Keyboard.press(KEY_RIGHT_ARROW);
-    rightState=true;
+    rightState = true;
+  }
+
+  if (!state) {
+    Keyboard.release(KEY_RIGHT_ARROW);
+    rightState = false;
+  }
+
+  // Rénitialisation automaitque après ~10 secondes
+  if(pause++ > 1000) {
+    cycles=0;
+    pause=0;
   }
   
-  if(!state){
-    Keyboard.release(KEY_RIGHT_ARROW);
-    rightState=false;
-  }
+  displayNumber(cycles);
+  refreshDisplay();
 }
 
